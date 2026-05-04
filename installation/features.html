@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fonctionnalités — Perfect Rentals</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <div class="title">Perfect Rentals</div>
+        <div class="version">Documentation v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Commencer</div>
+        <a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a>
+        <a href="setup.html"><i class="fa-solid fa-download"></i> Installation</a>
+        <a href="config.html"><i class="fa-solid fa-gear"></i> Configuration</a>
+        <div class="nav-label">Utilisation</div>
+        <a href="features.html" class="active"><i class="fa-solid fa-star"></i> Fonctionnalités</a>
+        <a href="api.html"><i class="fa-solid fa-plug"></i> API & Sécurité</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+    </div>
+</aside>
+
+<div class="main">
+
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Docs</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> Fonctionnalités</div>
+        <h1>Fonctionnalités</h1>
+        <p>Tout ce que Perfect Rentals propose côté joueur et administrateur.</p>
+    </div>
+
+    <div class="page-content">
+
+        <!-- PLAYER -->
+        <h2><span class="ico"><i class="fa-solid fa-user"></i></span> Côté joueur</h2>
+
+        <div class="grid">
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-grip"></i></div>
+                <div>
+                    <h4>Catalogue véhicules</h4>
+                    <p>Grille avec images, recherche par nom, filtres par catégorie / places / prix, tri dynamique.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-car"></i></div>
+                <div>
+                    <h4>Fiche détaillée</h4>
+                    <p>Stats complètes (vitesse, tenue de route, freinage, coffre, sièges) et tags descriptifs.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-video"></i></div>
+                <div>
+                    <h4>Showroom 3D</h4>
+                    <p>Prévisualisation du véhicule en jeu avec caméra rotative avant de louer.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-file-signature"></i></div>
+                <div>
+                    <h4>Contrat interactif</h4>
+                    <p>Choix durée, assurance, carburant, livraison — récapitulatif complet avant signature.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-credit-card"></i></div>
+                <div>
+                    <h4>Paiement sécurisé</h4>
+                    <p>Cash ou banque. Calcul 100% serveur, caution incluse. Item contrat reçu dans l'inventaire.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-truck-fast"></i></div>
+                <div>
+                    <h4>Système de livraison</h4>
+                    <p>Le véhicule apparaît au point de spawn. GPS + blip clignotant pour le récupérer.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <div>
+                    <h4>Restitution & Scan</h4>
+                    <p>Scan automatique (moteur, carrosserie, carburant, roues). Calcul pénalités avec récapitulatif.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div>
+                    <h4>Prolongation</h4>
+                    <p>Prolonger la durée depuis le menu de location active (+30min, +1h, +1j).</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-receipt"></i></div>
+                <div>
+                    <h4>Historique</h4>
+                    <p>Toutes les locations passées consultables : véhicule, dates, pénalités, remboursement.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-route"></i></div>
+                <div>
+                    <h4>GPS retour</h4>
+                    <p>Bouton pour placer un waypoint vers le point de retour le plus proche.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CAUTION -->
+        <h2><span class="ico"><i class="fa-solid fa-gavel"></i></span> Caution & Pénalités</h2>
+
+        <div class="card">
+            <h3>Caution</h3>
+            <p>Débitée au moment de la location (ajoutée au prix total). Remboursée à la restitution, <strong>moins</strong> les pénalités éventuelles. Si les pénalités dépassent la caution, le surplus est débité du compte du joueur.</p>
+        </div>
+
+        <table>
+            <thead><tr><th>Type</th><th>Calcul</th><th>Assurance</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:var(--orange)">Retard</strong></td><td><code>2$/min</code> après 5 min de grâce</td><td>Non affecté</td></tr>
+                <tr><td><strong style="color:var(--red)">Dégâts</strong></td><td><code>10$/% de dommage</code></td><td>Réduit de 50% (Standard) ou 90% (Premium)</td></tr>
+                <tr><td><strong style="color:var(--accent-light)">Carburant</strong></td><td><code>5$/% manquant</code></td><td>Non affecté (politique plein→plein)</td></tr>
+                <tr><td><strong style="color:var(--red)">Roues</strong></td><td><code>200$</code> forfait</td><td>Non affecté</td></tr>
+                <tr><td><strong style="color:var(--red)">Détruit</strong></td><td><code>caution × 2.0</code></td><td>Non applicable</td></tr>
+            </tbody>
+        </table>
+
+        <table>
+            <thead><tr><th>Assurance</th><th>Surcoût</th><th>Réduction dégâts</th></tr></thead>
+            <tbody>
+                <tr><td>Aucune</td><td>+0%</td><td>0%</td></tr>
+                <tr><td style="color:var(--accent-light)">Standard</td><td>+15%</td><td>-50%</td></tr>
+                <tr><td style="color:var(--green)">Premium</td><td>+30%</td><td>-90%</td></tr>
+            </tbody>
+        </table>
+
+        <!-- ADMIN -->
+        <h2><span class="ico"><i class="fa-solid fa-shield-halved"></i></span> Panel Admin</h2>
+
+        <div class="alert alert-info">
+            <i class="fa-solid fa-terminal"></i>
+            <span>Le panel admin s'ouvre avec <code>/rentaladmin</code> (réservé aux groupes configurés dans <code>Config.AdminGroups</code>).</span>
+        </div>
+
+        <div class="grid">
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <h4>Dashboard</h4>
+                    <p>Vue d'ensemble : nombre de véhicules, points de location, contrats actifs.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-car-side"></i></div>
+                <div>
+                    <h4>Gestion véhicules</h4>
+                    <p>Ajouter, modifier, supprimer des véhicules. Image, stats, prix, stock, catégorie, tags.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-location-dot"></i></div>
+                <div>
+                    <h4>Gestion points</h4>
+                    <p>Créer des agences avec placement interactif en jeu (PNJ, spawns, retour, showroom).</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-sliders"></i></div>
+                <div>
+                    <h4>Config par agence</h4>
+                    <p>Choisir les véhicules disponibles par point, surcharger prix et cautions individuellement.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-file-contract"></i></div>
+                <div>
+                    <h4>Contrats actifs</h4>
+                    <p>Voir tous les contrats en cours, forcer un retour, rembourser un joueur.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-map-marked-alt"></i></div>
+                <div>
+                    <h4>Placement in-game</h4>
+                    <p>Se déplacer en jeu et poser les points avec la touche E. Marqueurs visuels en temps réel.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Ajouter un véhicule via SQL</h3>
+            <div class="code-lang">SQL</div>
+<pre><code>INSERT INTO rentals_vehicles
+  (model, label, category, price_per_day, deposit, seats, trunk, speed, image_url)
+VALUES
+  ('adder', 'Adder', 'super', 3500, 7000, 2, 10, 99,
+   'https://cdn.jsdelivr.net/gh/MericcaN41/gta5carimages@main/images/adder.png');</code></pre>
+        </div>
+
+        <div class="card">
+            <h3>Ajouter un point via SQL</h3>
+            <div class="code-lang">SQL</div>
+<pre><code>INSERT INTO rentals_locations
+  (name, coords_json, spawnpoints_json, blip_sprite, blip_color, ped_model)
+VALUES (
+  'Mon agence',
+  '{"x":100.0,"y":200.0,"z":30.0,"h":180.0}',
+  '[{"x":105.0,"y":205.0,"z":30.0,"h":90.0}]',
+  226, 3, 's_m_m_autoshop_02'
+);</code></pre>
+        </div>
+
+        <div class="page-nav">
+            <a href="config.html">
+                <div class="pn-label">Précédent</div>
+                <div class="pn-title"><i class="fa-solid fa-arrow-left" style="font-size:12px"></i> Configuration</div>
+            </a>
+            <a href="api.html" class="next">
+                <div class="pn-label">Suivant</div>
+                <div class="pn-title">API & Sécurité <i class="fa-solid fa-arrow-right" style="font-size:12px"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="doc-footer">
+        <div class="fb">Spectre Script</div>
+        <a class="fd" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Rejoindre le Discord</a>
+        <p class="fc">&copy; 2025 Spectre Script — Tous droits réservés.</p>
+    </footer>
+
+</div>
+</div>
+</body>
+</html>

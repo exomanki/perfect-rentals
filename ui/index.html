@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Perfect Rentals</title>
+</head>
+<body>
+    <div id="app" class="app hidden">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fa-solid fa-car-side"></i></div>
+                <span class="brand-text">RENTALS</span>
+            </div>
+            <div class="sidebar-nav">
+                <a class="nav-link active" data-page="catalog"><i class="fa-solid fa-grip"></i><span data-i18n="nav_catalog">Catalogue</span></a>
+                <a class="nav-link" data-page="activeRental"><i class="fa-solid fa-key"></i><span data-i18n="nav_active">Ma Location</span></a>
+                <a class="nav-link" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i><span data-i18n="nav_history">Historique</span></a>
+            </div>
+            <div class="sidebar-footer">
+                <a class="spectre-footer" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+                <button class="btn-close-ui" onclick="App.close()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="content">
+
+            <!-- ========== CATALOG ========== -->
+            <section id="page-catalog" class="page active">
+                <div class="page-header">
+                    <h1 data-i18n="cat_title">Catalogue</h1>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" data-i18n-placeholder="search_ph" placeholder="Rechercher un véhicule..." oninput="App.filterCatalog()">
+                    </div>
+                </div>
+                <div class="filters-row">
+                    <div class="filter-chips" id="filter-chips"></div>
+                    <div class="sort-select">
+                        <select id="sort-select" onchange="App.filterCatalog()">
+                            <option value="default" data-i18n="sort_default">Tri par défaut</option>
+                            <option value="price-asc" data-i18n="sort_price_asc">Prix croissant</option>
+                            <option value="price-desc" data-i18n="sort_price_desc">Prix décroissant</option>
+                            <option value="name" data-i18n="sort_name">Alphabétique</option>
+                            <option value="speed" data-i18n="sort_speed">Vitesse</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="vehicle-grid" id="vehicle-grid"></div>
+            </section>
+
+            <!-- ========== VEHICLE DETAIL ========== -->
+            <section id="page-detail" class="page">
+                <button class="btn-back" onclick="App.goTo('catalog')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="detail_back">Retour</span></button>
+                <div class="detail-layout">
+                    <div class="detail-left">
+                        <div class="detail-image-wrap">
+                            <img id="detail-img" src="" alt="">
+                            <button class="btn-showroom" onclick="App.showroom()"><i class="fa-solid fa-eye"></i> <span data-i18n="showroom_3d">Showroom 3D</span></button>
+                        </div>
+                        <div class="detail-stats" id="detail-stats"></div>
+                    </div>
+                    <div class="detail-right">
+                        <h2 id="detail-name"></h2>
+                        <div class="detail-tags" id="detail-tags"></div>
+                        <div class="detail-price-tag" id="detail-base-price"></div>
+
+                        <div class="config-section">
+                            <h3 data-i18n="sec_duration">Durée</h3>
+                            <div class="option-grid" id="duration-options"></div>
+                        </div>
+                        <div class="config-section">
+                            <h3 data-i18n="sec_insurance">Assurance</h3>
+                            <div class="option-grid" id="insurance-options"></div>
+                        </div>
+                        <div class="config-section">
+                            <h3 data-i18n="sec_fuel">Carburant</h3>
+                            <div class="option-grid" id="fuel-options"></div>
+                        </div>
+                        <div class="config-section">
+                            <h3 data-i18n="sec_payment">Paiement</h3>
+                            <div class="option-grid" id="payment-options"></div>
+                        </div>
+
+                        <div class="price-summary" id="price-summary"></div>
+                        <button class="btn-rent" id="btn-rent" onclick="App.goToContract()"><i class="fa-solid fa-file-signature"></i> <span data-i18n="sign_contract">Signer le contrat</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== CONTRACT ========== -->
+            <section id="page-contract" class="page">
+                <button class="btn-back" onclick="App.goTo('detail')"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="detail_back">Retour</span></button>
+                <div class="contract-document" id="contract-doc">
+                    <div class="contract-header-doc">
+                        <div class="contract-logo"><i class="fa-solid fa-car-side"></i> PERFECT RENTALS</div>
+                        <div class="contract-title" data-i18n="contract_title_doc">CONTRAT DE LOCATION</div>
+                        <div class="contract-num" id="contract-num-display"></div>
+                    </div>
+                    <div class="contract-body">
+                        <div class="contract-row"><span data-i18n="ctr_tenant">Locataire</span><strong id="ctr-player"></strong></div>
+                        <div class="contract-row"><span data-i18n="ctr_datetime">Date & Heure</span><strong id="ctr-date"></strong></div>
+                        <div class="contract-divider"></div>
+                        <div class="contract-row"><span data-i18n="ctr_vehicle">Véhicule</span><strong id="ctr-vehicle"></strong></div>
+                        <div class="contract-row"><span data-i18n="ctr_duration">Durée</span><strong id="ctr-duration"></strong></div>
+                        <div class="contract-divider"></div>
+                        <div class="contract-row"><span data-i18n="ctr_rent_price">Prix location</span><strong id="ctr-price"></strong></div>
+                        <div class="contract-row"><span data-i18n="ctr_insurance">Assurance</span><strong id="ctr-insurance"></strong></div>
+                        <div class="contract-row"><span data-i18n="ctr_fuel">Carburant</span><strong id="ctr-fuel"></strong></div>
+                        <div class="contract-row"><span data-i18n="ctr_deposit">Caution</span><strong id="ctr-deposit"></strong></div>
+                        <div class="contract-divider"></div>
+                        <div class="contract-row contract-total"><span data-i18n="ctr_total">TOTAL</span><strong id="ctr-total"></strong></div>
+                    </div>
+                    <div class="contract-terms">
+                        <p data-i18n="ctr_terms">En signant ce contrat, je m'engage à restituer le véhicule en bon état dans les délais convenus.
+                        Tout retard, dégât ou non-restitution entraînera des pénalités déduites de la caution.</p>
+                    </div>
+                    <div class="contract-signature">
+                        <label class="contract-accept">
+                            <input type="checkbox" id="ctr-accept"> <span data-i18n="ctr_accept">J'accepte les conditions du contrat</span>
+                        </label>
+                        <button class="btn-sign" id="btn-sign" onclick="App.signContract()" disabled>
+                            <i class="fa-solid fa-signature"></i> <span data-i18n="sign_pay">Signer & Payer</span>
+                        </button>
+                    </div>
+                    <div class="contract-stamp hidden" id="contract-stamp">APPROUVÉ</div>
+                </div>
+            </section>
+
+            <!-- ========== ACTIVE RENTAL ========== -->
+            <section id="page-activeRental" class="page">
+                <div class="active-rental-wrap" id="active-rental-content">
+                    <div class="no-rental-msg hidden" id="no-rental-msg">
+                        <i class="fa-solid fa-car"></i>
+                        <p data-i18n="rental_none">Aucune location en cours</p>
+                    </div>
+                    <div class="rental-card" id="rental-card">
+                        <div class="rental-card-header">
+                            <div class="rental-vehicle-info">
+                                <img id="rental-img" src="" alt="">
+                                <div>
+                                    <h2 id="rental-model"></h2>
+                                    <span class="rental-plate" id="rental-plate"></span>
+                                </div>
+                            </div>
+                            <div class="rental-timer" id="rental-timer">
+                                <div class="timer-label" data-i18n="timer_label">Temps restant</div>
+                                <div class="timer-value" id="timer-value">--:--:--</div>
+                            </div>
+                        </div>
+                        <div class="rental-details-grid" id="rental-details-grid"></div>
+                        <div class="rental-actions">
+                            <button class="btn-action" onclick="App.gpsReturn()"><i class="fa-solid fa-location-dot"></i> <span data-i18n="btn_gps">GPS Retour</span></button>
+                            <button class="btn-action" onclick="App.openExtend()"><i class="fa-solid fa-clock"></i> <span data-i18n="btn_extend">Prolonger</span></button>
+                            <button class="btn-action btn-danger" onclick="App.startReturn()"><i class="fa-solid fa-flag-checkered"></i> <span data-i18n="btn_return">Restituer</span></button>
+                        </div>
+                        <div class="extend-panel hidden" id="extend-panel">
+                            <h3 data-i18n="extend_title">Prolongation</h3>
+                            <div class="extend-options" id="extend-options"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SCAN / RETURN ========== -->
+            <section id="page-scan" class="page">
+                <div class="scan-wrap">
+                    <div class="scan-header">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        <h2 data-i18n="scan_title">Inspection du véhicule</h2>
+                    </div>
+                    <div class="scan-checks" id="scan-checks">
+                        <div class="scan-item" data-check="body">
+                            <div class="scan-icon"><i class="fa-solid fa-car-side"></i></div>
+                            <div class="scan-info"><span data-i18n="scan_body">Carrosserie</span><div class="scan-bar"><div class="scan-fill" id="scan-body"></div></div></div>
+                            <div class="scan-value" id="scan-body-val">—</div>
+                        </div>
+                        <div class="scan-item" data-check="engine">
+                            <div class="scan-icon"><i class="fa-solid fa-gear"></i></div>
+                            <div class="scan-info"><span data-i18n="scan_engine">Moteur</span><div class="scan-bar"><div class="scan-fill" id="scan-engine"></div></div></div>
+                            <div class="scan-value" id="scan-engine-val">—</div>
+                        </div>
+                        <div class="scan-item" data-check="fuel">
+                            <div class="scan-icon"><i class="fa-solid fa-gas-pump"></i></div>
+                            <div class="scan-info"><span data-i18n="scan_fuel">Essence</span><div class="scan-bar"><div class="scan-fill" id="scan-fuel"></div></div></div>
+                            <div class="scan-value" id="scan-fuel-val">—</div>
+                        </div>
+                        <div class="scan-item" data-check="wheels">
+                            <div class="scan-icon"><i class="fa-solid fa-circle-dot"></i></div>
+                            <div class="scan-info"><span data-i18n="scan_wheels">Roues</span><div class="scan-bar"><div class="scan-fill" id="scan-wheels"></div></div></div>
+                            <div class="scan-value" id="scan-wheels-val">—</div>
+                        </div>
+                    </div>
+                    <div class="scan-result hidden" id="scan-result">
+                        <div class="scan-penalties" id="scan-penalties"></div>
+                        <div class="scan-summary" id="scan-summary"></div>
+                    </div>
+                    <div class="scan-actions">
+                        <div id="btn-scan" class="hidden"></div>
+                        <button class="btn-action btn-danger hidden" id="btn-confirm-return" onclick="App.confirmReturn()"><i class="fa-solid fa-check"></i> <span data-i18n="confirm_return">Confirmer la restitution</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== HISTORY ========== -->
+            <section id="page-history" class="page">
+                <div class="page-header"><h1 data-i18n="hist_title">Historique</h1></div>
+                <div class="history-list" id="history-list"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ================================================================
+         ADMIN PANEL — Completely separate interface
+         ================================================================ -->
+    <div id="admin-app" class="adm hidden">
+        <nav class="adm-sidebar">
+            <div class="adm-brand">
+                <div class="adm-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <span class="adm-brand-text">ADMIN</span>
+            </div>
+            <div class="adm-nav">
+                <a class="adm-link active" data-section="adm-dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+                <a class="adm-link" data-section="adm-vehicles"><i class="fa-solid fa-car"></i><span>Véhicules</span></a>
+                <a class="adm-link" data-section="adm-locations"><i class="fa-solid fa-location-dot"></i><span>Points</span></a>
+                <a class="adm-link" data-section="adm-contracts"><i class="fa-solid fa-file-contract"></i><span>Contrats</span></a>
+            </div>
+            <div class="adm-sidebar-footer">
+                <a class="spectre-footer" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+                <button class="adm-btn-close" onclick="Admin.close()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </nav>
+        <main class="adm-content">
+            <section id="adm-dashboard" class="adm-page active"></section>
+            <section id="adm-vehicles" class="adm-page"></section>
+            <section id="adm-locations" class="adm-page"></section>
+            <section id="adm-contracts" class="adm-page"></section>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal-box" id="modal-box"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

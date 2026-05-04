@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Configuration — Perfect Rentals</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <div class="title">Perfect Rentals</div>
+        <div class="version">Documentation v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Commencer</div>
+        <a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a>
+        <a href="setup.html"><i class="fa-solid fa-download"></i> Installation</a>
+        <a href="config.html" class="active"><i class="fa-solid fa-gear"></i> Configuration</a>
+        <div class="nav-label">Utilisation</div>
+        <a href="features.html"><i class="fa-solid fa-star"></i> Fonctionnalités</a>
+        <a href="api.html"><i class="fa-solid fa-plug"></i> API & Sécurité</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+    </div>
+</aside>
+
+<div class="main">
+
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Docs</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> Configuration</div>
+        <h1>Configuration</h1>
+        <p>Référence complète de toutes les options de <code>config.lua</code>.</p>
+    </div>
+
+    <div class="page-content">
+
+        <!-- General -->
+        <h2><span class="ico"><i class="fa-solid fa-sliders"></i></span> Général</h2>
+        <table>
+            <thead><tr><th>Option</th><th>Type</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>Config.Framework</code></td><td>string</td><td><code>'esx'</code></td><td>Framework du serveur : <code>'esx'</code>, <code>'qbcore'</code> ou <code>'standalone'</code>.</td></tr>
+                <tr><td><code>Config.TargetSystem</code></td><td>string</td><td><code>'ox_target'</code></td><td>Système d'interaction PNJ : <code>'ox_target'</code>, <code>'qtarget'</code> ou <code>'none'</code>.</td></tr>
+                <tr><td><code>Config.Locale</code></td><td>string</td><td><code>'fr'</code></td><td>Langue de l'interface : <code>'fr'</code> ou <code>'en'</code>.</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Admin -->
+        <h2><span class="ico"><i class="fa-solid fa-shield-halved"></i></span> Administration</h2>
+        <table>
+            <thead><tr><th>Option</th><th>Type</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>Config.AdminGroups</code></td><td>table</td><td><code>{'admin','superadmin','god'}</code></td><td>Groupes autorisés à utiliser <code>/rentaladmin</code>.</td></tr>
+                <tr><td><code>Config.AdminJobs</code></td><td>table</td><td><code>{}</code></td><td>Jobs ayant accès au panel admin. Ex : <code>{'mechanic'}</code>.</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Durations -->
+        <h2><span class="ico"><i class="fa-solid fa-clock"></i></span> Durées de location</h2>
+        <div class="card">
+            <p><code>Config.Durations</code> — Durées proposées au joueur. Chaque entrée :</p>
+            <table>
+                <thead><tr><th>Clé</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>minutes</code></td><td>Durée en minutes réelles (<code>1440</code> = 1 jour).</td></tr>
+                    <tr><td><code>label</code></td><td>Texte affiché dans l'UI.</td></tr>
+                    <tr><td><code>multiplier</code></td><td>Coefficient appliqué au <code>price_per_day</code>. <code>1.0</code> = 1 jour complet. Utilisez des valeurs inférieures à la durée réelle pour offrir des réductions longue durée.</td></tr>
+                </tbody>
+            </table>
+            <div class="code-lang">Exemple</div>
+<pre><code>Config.Durations = {
+    { minutes = 30,    label = '30 minutes',  multiplier = 0.02  },
+    { minutes = 60,    label = '1 heure',     multiplier = 0.042 },
+    { minutes = 360,   label = '6 heures',    multiplier = 0.25  },
+    { minutes = 1440,  label = '1 jour',      multiplier = 1.0   },
+    { minutes = 4320,  label = '3 jours',     multiplier = 2.8   },  -- 2.8 au lieu de 3 = -7% de réduction
+    { minutes = 10080, label = '7 jours',     multiplier = 6.0   },  -- 6.0 au lieu de 7 = -14% de réduction
+}</code></pre>
+        </div>
+
+        <!-- Quick Extend -->
+        <h2><span class="ico"><i class="fa-solid fa-forward"></i></span> Prolongation rapide</h2>
+        <div class="card">
+            <p><code>Config.QuickExtend</code> — Options affichées quand le joueur veut prolonger une location en cours.</p>
+            <div class="code-lang">Exemple</div>
+<pre><code>Config.QuickExtend = {
+    { minutes = 30,   label = '+30 min' },
+    { minutes = 60,   label = '+1h' },
+    { minutes = 1440, label = '+1 jour' },
+}</code></pre>
+        </div>
+
+        <!-- Insurance -->
+        <h2><span class="ico"><i class="fa-solid fa-shield-heart"></i></span> Assurances</h2>
+        <div class="card">
+            <p><code>Config.Insurance</code> — Niveaux d'assurance au choix du joueur.</p>
+            <table>
+                <thead><tr><th>Clé</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>label</code></td><td>Nom affiché dans l'interface.</td></tr>
+                    <tr><td><code>multiplier</code></td><td>Surcoût en % du prix de base. <code>0.15</code> = +15%.</td></tr>
+                    <tr><td><code>damageReduction</code></td><td>Réduction des pénalités dégâts. <code>0.50</code> = -50%, <code>0.90</code> = -90%.</td></tr>
+                </tbody>
+            </table>
+            <div class="code-lang">Exemple</div>
+<pre><code>Config.Insurance = {
+    none     = { label = 'Aucune',   multiplier = 0.00, damageReduction = 0.0  },
+    standard = { label = 'Standard', multiplier = 0.15, damageReduction = 0.50 },
+    premium  = { label = 'Premium',  multiplier = 0.30, damageReduction = 0.90 },
+}</code></pre>
+        </div>
+
+        <!-- Fuel Policies -->
+        <h2><span class="ico"><i class="fa-solid fa-gas-pump"></i></span> Politiques de carburant</h2>
+        <div class="card">
+            <p><code>Config.FuelPolicies</code></p>
+            <table>
+                <thead><tr><th>Identifiant</th><th>Fonctionnement</th></tr></thead>
+                <tbody>
+                    <tr><td><code>full_to_full</code></td><td>Livré plein, doit être rendu plein. Pénalité de <code>fuelCostPerPercent</code> $/% manquant.</td></tr>
+                    <tr><td><code>flat_rate</code></td><td>Forfait fixe <code>flatCost</code> ajouté au prix. Pas de pénalité carburant.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Penalties -->
+        <h2><span class="ico"><i class="fa-solid fa-gavel"></i></span> Pénalités</h2>
+        <div class="card">
+            <p><code>Config.Penalties</code> — Montants calculés automatiquement à la restitution.</p>
+            <table>
+                <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>latePerMinute</code></td><td><code>2</code></td><td>$/minute de retard (après grâce).</td></tr>
+                    <tr><td><code>lateGracePeriod</code></td><td><code>5</code></td><td>Minutes de tolérance avant pénalité retard.</td></tr>
+                    <tr><td><code>damagePerPercent</code></td><td><code>10</code></td><td>$/% de dommage (réduit par assurance).</td></tr>
+                    <tr><td><code>fuelPerPercent</code></td><td><code>5</code></td><td>$/% carburant manquant (plein→plein).</td></tr>
+                    <tr><td><code>destroyedMultiplier</code></td><td><code>2.0</code></td><td>Si détruit : pénalité = caution × ce chiffre.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Payment / Vehicle / Showroom -->
+        <h2><span class="ico"><i class="fa-solid fa-wallet"></i></span> Paiement & Véhicule</h2>
+        <table>
+            <thead><tr><th>Option</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>Config.PaymentMethods</code></td><td><code>{'bank','cash'}</code></td><td>Méthodes de paiement disponibles.</td></tr>
+                <tr><td><code>Config.DefaultPayment</code></td><td><code>'bank'</code></td><td>Méthode sélectionnée par défaut.</td></tr>
+                <tr><td><code>Config.DeliveryCost</code></td><td><code>200</code></td><td>Coût de livraison ($).</td></tr>
+                <tr><td><code>Config.FuelLevel</code></td><td><code>100.0</code></td><td>Carburant du véhicule à la livraison (0-100).</td></tr>
+                <tr><td><code>Config.PlatePrefix</code></td><td><code>'RNT'</code></td><td>Préfixe des plaques (max 3 car.). Ex : <code>RNT482XY</code>.</td></tr>
+                <tr><td><code>Config.SpawnDistance</code></td><td><code>80.0</code></td><td>Distance max (m) pour le spawn véhicule.</td></tr>
+            </tbody>
+        </table>
+
+        <h2><span class="ico"><i class="fa-solid fa-video"></i></span> Showroom</h2>
+        <table>
+            <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>enabled</code></td><td><code>true</code></td><td>Active la prévisualisation 3D des véhicules.</td></tr>
+                <tr><td><code>camDistance</code></td><td><code>6.0</code></td><td>Distance caméra → véhicule (m).</td></tr>
+                <tr><td><code>camHeight</code></td><td><code>1.5</code></td><td>Hauteur de la caméra (m).</td></tr>
+                <tr><td><code>rotateSpeed</code></td><td><code>0.5</code></td><td>Vitesse de rotation automatique.</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Rate Limit -->
+        <h2><span class="ico"><i class="fa-solid fa-gauge-high"></i></span> Rate-limiting</h2>
+        <table>
+            <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>rentCooldown</code></td><td><code>5000</code></td><td>Délai min entre 2 locations (ms).</td></tr>
+                <tr><td><code>returnCooldown</code></td><td><code>5000</code></td><td>Délai min entre 2 restitutions.</td></tr>
+                <tr><td><code>extendCooldown</code></td><td><code>5000</code></td><td>Délai min entre 2 prolongations.</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Blip -->
+        <h2><span class="ico"><i class="fa-solid fa-map-pin"></i></span> Blips</h2>
+        <table>
+            <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>sprite</code></td><td><code>226</code></td><td>ID du sprite GTA V. <a href="https://docs.fivem.net/docs/game-references/blips/" target="_blank">Référence</a>.</td></tr>
+                <tr><td><code>color</code></td><td><code>3</code></td><td>Couleur du blip. <code>3</code> = bleu clair.</td></tr>
+                <tr><td><code>scale</code></td><td><code>0.7</code></td><td>Taille du blip sur la carte.</td></tr>
+                <tr><td><code>label</code></td><td><code>'Location de véhicules'</code></td><td>Nom dans la légende (groupé automatiquement).</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Interaction -->
+        <h2><span class="ico"><i class="fa-solid fa-hand-pointer"></i></span> Interaction</h2>
+        <table>
+            <thead><tr><th>Option</th><th>Défaut</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>Config.InteractDistance</code></td><td><code>2.5</code></td><td>Distance d'interaction PNJ (m).</td></tr>
+                <tr><td><code>Config.DrawDistance</code></td><td><code>15.0</code></td><td>Distance d'affichage markers/PNJ (mode sans target).</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Theme -->
+        <h2><span class="ico"><i class="fa-solid fa-palette"></i></span> Thème UI</h2>
+        <div class="card">
+            <p><code>Config.Theme</code> — Changez les couleurs de l'interface sans toucher au CSS. Format HEX <code>#RRGGBB</code>.</p>
+            <table>
+                <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>accent</code></td><td><span class="swatch" style="background:#6366f1;color:#fff">#6366f1</span></td><td>Couleur principale (boutons, liens, éléments actifs).</td></tr>
+                    <tr><td><code>accentLight</code></td><td><span class="swatch" style="background:#818cf8;color:#fff">#818cf8</span></td><td>Variante claire (hover, titres, icônes).</td></tr>
+                    <tr><td><code>green</code></td><td><span class="swatch" style="background:#34d399;color:#000">#34d399</span></td><td>Succès (confirmations, stock dispo).</td></tr>
+                    <tr><td><code>red</code></td><td><span class="swatch" style="background:#f87171;color:#000">#f87171</span></td><td>Danger (erreurs, pénalités, suppression).</td></tr>
+                    <tr><td><code>orange</code></td><td><span class="swatch" style="background:#fbbf24;color:#000">#fbbf24</span></td><td>Avertissement (retard, alertes).</td></tr>
+                    <tr><td><code>bgPrimary</code></td><td><span class="swatch" style="background:#0a0a12;color:#eef0f6">#0a0a12</span></td><td>Fond principal.</td></tr>
+                    <tr><td><code>bgSecondary</code></td><td><span class="swatch" style="background:#121220;color:#eef0f6">#121220</span></td><td>Fond secondaire (sidebar, sections).</td></tr>
+                    <tr><td><code>bgCard</code></td><td><span class="swatch" style="background:#161628;color:#eef0f6">#161628</span></td><td>Fond des cartes et modales.</td></tr>
+                    <tr><td><code>textPrimary</code></td><td><span class="swatch" style="background:#eef0f6;color:#000">#eef0f6</span></td><td>Texte principal.</td></tr>
+                    <tr><td><code>textSecondary</code></td><td><span class="swatch" style="background:#c8cddc;color:#000">#c8cddc</span></td><td>Texte secondaire.</td></tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Les couleurs dérivées (glow, hover, muted) sont calculées automatiquement.</span>
+            </div>
+            <div class="code-lang">Exemples de thèmes</div>
+<pre><code>-- Thème Rouge
+Config.Theme = {
+    accent = '#ef4444', accentLight = '#f87171',
+    green = '#34d399', red = '#f87171', orange = '#fbbf24',
+    bgPrimary = '#0a0a12', bgSecondary = '#1a1014', bgCard = '#201418',
+    textPrimary = '#eef0f6', textSecondary = '#c8cddc',
+}
+
+-- Thème Émeraude
+Config.Theme = {
+    accent = '#10b981', accentLight = '#34d399',
+    green = '#34d399', red = '#f87171', orange = '#fbbf24',
+    bgPrimary = '#060e0a', bgSecondary = '#0c1a12', bgCard = '#122018',
+    textPrimary = '#eef0f6', textSecondary = '#c8cddc',
+}
+
+-- Thème Or / Luxe
+Config.Theme = {
+    accent = '#f59e0b', accentLight = '#fbbf24',
+    green = '#34d399', red = '#f87171', orange = '#fbbf24',
+    bgPrimary = '#0e0c06', bgSecondary = '#1a180c', bgCard = '#201e10',
+    textPrimary = '#eef0f6', textSecondary = '#c8cddc',
+}</code></pre>
+        </div>
+
+        <!-- Webhook -->
+        <h2><span class="ico"><i class="fa-brands fa-discord"></i></span> Webhook Discord</h2>
+        <div class="card">
+            <p><code>Config.Webhook</code></p>
+            <table>
+                <thead><tr><th>Clé</th><th>Défaut</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>enabled</code></td><td><code>false</code></td><td>Active les notifications Discord.</td></tr>
+                    <tr><td><code>url</code></td><td><code>''</code></td><td>URL complète du webhook Discord.</td></tr>
+                    <tr><td><code>botName</code></td><td><code>'Perfect Rentals'</code></td><td>Nom du bot dans Discord.</td></tr>
+                    <tr><td><code>color</code></td><td><code>3447003</code></td><td>Couleur embed (décimal). <code>3447003</code> = bleu.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="page-nav">
+            <a href="setup.html">
+                <div class="pn-label">Précédent</div>
+                <div class="pn-title"><i class="fa-solid fa-arrow-left" style="font-size:12px"></i> Installation</div>
+            </a>
+            <a href="features.html" class="next">
+                <div class="pn-label">Suivant</div>
+                <div class="pn-title">Fonctionnalités <i class="fa-solid fa-arrow-right" style="font-size:12px"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="doc-footer">
+        <div class="fb">Spectre Script</div>
+        <a class="fd" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Rejoindre le Discord</a>
+        <p class="fc">&copy; 2025 Spectre Script — Tous droits réservés.</p>
+    </footer>
+
+</div>
+</div>
+</body>
+</html>

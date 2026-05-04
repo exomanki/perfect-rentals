@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Perfect Rentals — Documentation</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <div class="title">Perfect Rentals</div>
+        <div class="version">Documentation v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Commencer</div>
+        <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Accueil</a>
+        <a href="setup.html"><i class="fa-solid fa-download"></i> Installation</a>
+        <a href="config.html"><i class="fa-solid fa-gear"></i> Configuration</a>
+        <div class="nav-label">Utilisation</div>
+        <a href="features.html"><i class="fa-solid fa-star"></i> Fonctionnalités</a>
+        <a href="api.html"><i class="fa-solid fa-plug"></i> API & Sécurité</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+    </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+
+    <div class="hero">
+        <div class="hero-tag"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <h1>Perfect Rentals</h1>
+        <p>Système premium de location de véhicules pour FiveM — interface moderne, sécurité serveur, multi-framework.</p>
+        <div class="badges">
+            <span class="badge a">v1.0</span>
+            <span class="badge g">ESX / QBCore / Standalone</span>
+            <span class="badge">ox_lib</span>
+            <span class="badge">ox_target</span>
+            <span class="badge">oxmysql</span>
+        </div>
+    </div>
+
+    <div class="quick-grid">
+        <a class="quick-card" href="setup.html">
+            <div class="qc-ico"><i class="fa-solid fa-download"></i></div>
+            <h3>Installation</h3>
+            <p>SQL, server.cfg, item inventaire — tout pour démarrer en 5 minutes.</p>
+        </a>
+        <a class="quick-card" href="config.html">
+            <div class="qc-ico"><i class="fa-solid fa-gear"></i></div>
+            <h3>Configuration</h3>
+            <p>Chaque option de config.lua expliquée en détail, avec exemples.</p>
+        </a>
+        <a class="quick-card" href="features.html">
+            <div class="qc-ico"><i class="fa-solid fa-star"></i></div>
+            <h3>Fonctionnalités</h3>
+            <p>Catalogue, contrats, restitution, admin panel — tout ce que le script propose.</p>
+        </a>
+        <a class="quick-card" href="api.html">
+            <div class="qc-ico"><i class="fa-solid fa-plug"></i></div>
+            <h3>API & Sécurité</h3>
+            <p>Exports, webhooks Discord, mesures anti-exploit.</p>
+        </a>
+    </div>
+
+    <!-- Dependencies -->
+    <div class="page-content">
+        <h2><span class="ico"><i class="fa-solid fa-puzzle-piece"></i></span> Dépendances</h2>
+        <table>
+            <thead><tr><th>Ressource</th><th>Requis</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>oxmysql</code></td><td style="color:var(--green)">Obligatoire</td><td>Base de données MySQL</td></tr>
+                <tr><td><code>ox_lib</code></td><td style="color:var(--green)">Obligatoire</td><td>Callbacks, notifications, textUI</td></tr>
+                <tr><td><code>ox_target</code></td><td style="color:var(--orange)">Recommandé</td><td>Interaction PNJ (sinon markers classiques)</td></tr>
+                <tr><td><code>es_extended</code> / <code>qb-core</code></td><td style="color:var(--green)">Obligatoire</td><td>Framework (ou mode standalone)</td></tr>
+            </tbody>
+        </table>
+
+        <h2><span class="ico"><i class="fa-solid fa-folder-tree"></i></span> Arborescence</h2>
+        <div class="tree">
+<span class="f">perfect_rentals/</span>
+├── <span class="s">fxmanifest.lua</span>
+├── <span class="s">config.lua</span>
+├── <span class="f">installation/</span>
+│   ├── <span class="d">index.html</span>  <span class="d">setup.html</span>  <span class="d">config.html</span>
+│   ├── <span class="d">features.html</span>  <span class="d">api.html</span>  <span class="d">style.css</span>
+├── <span class="f">sql/</span>
+│   └── <span class="d">install.sql</span>
+├── <span class="f">locales/</span>
+│   ├── <span class="d">fr.lua</span>  └── <span class="d">en.lua</span>
+├── <span class="f">shared/</span>
+│   └── <span class="d">shared.lua</span>
+├── <span class="f">server/</span>
+│   ├── <span class="d">framework.lua</span>  <span class="d">database.lua</span>
+│   ├── <span class="d">webhooks.lua</span>  └── <span class="d">main.lua</span>
+├── <span class="f">client/</span>
+│   ├── <span class="d">framework.lua</span>  <span class="d">helpers.lua</span>
+│   ├── <span class="d">nui.lua</span>  └── <span class="d">main.lua</span>
+└── <span class="f">ui/</span>
+    ├── <span class="d">index.html</span>  <span class="d">style.css</span>  └── <span class="d">app.js</span>
+        </div>
+
+        <div class="page-nav">
+            <div></div>
+            <a href="setup.html" class="next">
+                <div class="pn-label">Suivant</div>
+                <div class="pn-title">Installation <i class="fa-solid fa-arrow-right" style="font-size:12px"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="doc-footer">
+        <div class="fb">Spectre Script</div>
+        <a class="fd" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Rejoindre le Discord</a>
+        <p class="fc">&copy; 2025 Spectre Script — Tous droits réservés.</p>
+    </footer>
+
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ne pas committer une config avec secrets webhook / tests locaux
+config.local.lua
+
+# Si vous ajoutez un build front un jour
+node_modules/
+npm-debug.log*

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Installation — Perfect Rentals</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <div class="title">Perfect Rentals</div>
+        <div class="version">Documentation v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Commencer</div>
+        <a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a>
+        <a href="setup.html" class="active"><i class="fa-solid fa-download"></i> Installation</a>
+        <a href="config.html"><i class="fa-solid fa-gear"></i> Configuration</a>
+        <div class="nav-label">Utilisation</div>
+        <a href="features.html"><i class="fa-solid fa-star"></i> Fonctionnalités</a>
+        <a href="api.html"><i class="fa-solid fa-plug"></i> API & Sécurité</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+    </div>
+</aside>
+
+<div class="main">
+
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Docs</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> Installation</div>
+        <h1>Installation</h1>
+        <p>Guide pas à pas pour installer Perfect Rentals sur votre serveur FiveM.</p>
+    </div>
+
+    <div class="page-content">
+
+        <!-- Step 1 -->
+        <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-body">
+                <h4>Base de données</h4>
+                <p>Importez le fichier SQL dans votre base de données MySQL (via phpMyAdmin, HeidiSQL ou CLI) :</p>
+                <div class="code-lang">SQL</div>
+                <pre><code>source sql/install.sql</code></pre>
+                <p>Ce fichier crée automatiquement les 5 tables nécessaires et insère les véhicules + points de location par défaut.</p>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-body">
+                <h4>Placer la resource</h4>
+                <p>Copiez le dossier <code>perfect_rentals</code> dans vos resources :</p>
+                <pre><code>resources/[addons]/perfect_rentals/</code></pre>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-body">
+                <h4>server.cfg</h4>
+                <p>Ajoutez dans votre <code>server.cfg</code> :</p>
+                <pre><code>ensure perfect_rentals</code></pre>
+                <div class="alert alert-warn">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span><strong>Important :</strong> cette ligne doit être placée <strong>après</strong> les dépendances (<code>oxmysql</code>, <code>ox_lib</code>, <code>es_extended</code> / <code>qb-core</code>).</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-body">
+                <h4>Configuration de base</h4>
+                <p>Ouvrez <code>config.lua</code> et modifiez les 3 lignes essentielles :</p>
+                <div class="code-lang">config.lua</div>
+<pre><code>Config.Framework    = 'esx'          -- 'esx', 'qbcore' ou 'standalone'
+Config.TargetSystem = 'ox_target'    -- 'ox_target', 'qtarget' ou 'none'
+Config.Locale       = 'fr'           -- 'fr' ou 'en'</code></pre>
+                <div class="alert alert-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Consultez la page <a href="config.html">Configuration</a> pour le détail complet de toutes les options.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step">
+            <div class="step-n">5</div>
+            <div class="step-body">
+                <h4>Item <code>contract</code></h4>
+                <p>Le joueur reçoit un item <code>contract</code> dans son inventaire à chaque location. Ajoutez-le selon votre système d'inventaire :</p>
+
+                <h3>ESX (base de données)</h3>
+                <div class="code-lang">SQL</div>
+<pre><code>INSERT INTO items (name, label, weight, rare, can_remove)
+VALUES ('contract', 'Contract', 1, 0, 1);</code></pre>
+
+                <h3>QBCore (qb-core/shared/items.lua)</h3>
+                <div class="code-lang">Lua</div>
+<pre><code>contract = {
+    name        = 'contract',
+    label       = 'Contract',
+    weight      = 1,
+    type        = 'item',
+    image       = 'contract.png',
+    unique      = false,
+    useable     = true,
+    shouldClose = true,
+    combinable  = nil,
+    description = 'Contrat de location — Utilisez pour montrer'
+}</code></pre>
+
+                <h3>ox_inventory (data/items.lua)</h3>
+                <div class="code-lang">Lua</div>
+<pre><code>["contract"] = {
+    label  = "Contract",
+    weight = 1,
+    stack  = true,
+    close  = true
+},</code></pre>
+
+                <h3>Quasar Inventory</h3>
+                <div class="code-lang">Lua</div>
+<pre><code>["contract"] = {
+    name        = 'contract',
+    label       = 'Contract',
+    weight      = 1,
+    type        = 'item',
+    image       = 'contract.png',
+    unique      = false,
+    useable     = true,
+    shouldClose = true,
+    description = 'Contrat de location — Utilisez pour montrer'
+}</code></pre>
+
+                <div class="alert alert-ok">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>L'item est donné automatiquement à la signature et retiré à la restitution (ou retour forcé admin).</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step">
+            <div class="step-n">6</div>
+            <div class="step-body">
+                <h4>Démarrer le serveur</h4>
+                <p>Redémarrez votre serveur ou exécutez <code>ensure perfect_rentals</code> dans la console. Vous devriez voir :</p>
+                <pre><code>[perfect_rentals] Loaded 22 vehicles, 2 locations.</code></pre>
+                <div class="alert alert-ok">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>C'est prêt ! Rendez-vous à l'un des points de location pour tester.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-nav">
+            <a href="index.html">
+                <div class="pn-label">Précédent</div>
+                <div class="pn-title"><i class="fa-solid fa-arrow-left" style="font-size:12px"></i> Accueil</div>
+            </a>
+            <a href="config.html" class="next">
+                <div class="pn-label">Suivant</div>
+                <div class="pn-title">Configuration <i class="fa-solid fa-arrow-right" style="font-size:12px"></i></div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="doc-footer">
+        <div class="fb">Spectre Script</div>
+        <a class="fd" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Rejoindre le Discord</a>
+        <p class="fc">&copy; 2025 Spectre Script — Tous droits réservés.</p>
+    </footer>
+
+</div>
+</div>
+</body>
+</html>

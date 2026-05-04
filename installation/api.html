@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>API & Sécurité — Perfect Rentals</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><i class="fa-solid fa-ghost"></i> Spectre Script</div>
+        <div class="title">Perfect Rentals</div>
+        <div class="version">Documentation v1.0</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Commencer</div>
+        <a href="index.html"><i class="fa-solid fa-house"></i> Accueil</a>
+        <a href="setup.html"><i class="fa-solid fa-download"></i> Installation</a>
+        <a href="config.html"><i class="fa-solid fa-gear"></i> Configuration</a>
+        <div class="nav-label">Utilisation</div>
+        <a href="features.html"><i class="fa-solid fa-star"></i> Fonctionnalités</a>
+        <a href="api.html" class="active"><i class="fa-solid fa-plug"></i> API & Sécurité</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Spectre Script</a>
+    </div>
+</aside>
+
+<div class="main">
+
+    <div class="page-header">
+        <div class="breadcrumb"><a href="index.html">Docs</a> <i class="fa-solid fa-chevron-right" style="font-size:9px"></i> API & Sécurité</div>
+        <h1>API & Sécurité</h1>
+        <p>Exports pour développeurs, webhooks Discord et mesures de sécurité intégrées.</p>
+    </div>
+
+    <div class="page-content">
+
+        <!-- EXPORTS -->
+        <h2><span class="ico"><i class="fa-solid fa-plug"></i></span> Exports</h2>
+        <p>Intégrez Perfect Rentals avec vos autres scripts via les exports.</p>
+
+        <h3>Server-side</h3>
+        <div class="code-lang">Lua (server)</div>
+<pre><code>-- Vérifie si un joueur a une location active
+-- Retourne : bool, contract|nil
+local hasRental, contract = exports['perfect_rentals']:HasActiveRental(source)
+
+-- Récupère le contrat actif du joueur
+-- Retourne : contract|nil
+local contract = exports['perfect_rentals']:GetActiveContract(source)
+
+-- Force la restitution d'un contrat par ID
+-- Retourne : bool (succès)
+exports['perfect_rentals']:ForceReturn(contractId)</code></pre>
+
+        <h3>Client-side</h3>
+        <div class="code-lang">Lua (client)</div>
+<pre><code>-- Ouvre l'UI de location pour une agence spécifique
+exports['perfect_rentals']:OpenRentalUI(locationId)</code></pre>
+
+        <h3>Objet contrat retourné</h3>
+        <div class="card">
+            <p>Les exports qui retournent un contrat fournissent cet objet :</p>
+            <table>
+                <thead><tr><th>Champ</th><th>Type</th><th>Description</th></tr></thead>
+                <tbody>
+                    <tr><td><code>id</code></td><td>int</td><td>ID unique du contrat en base.</td></tr>
+                    <tr><td><code>contract_num</code></td><td>string</td><td>Numéro de contrat (ex : <code>PR-2501-0042</code>).</td></tr>
+                    <tr><td><code>identifier</code></td><td>string</td><td>Identifiant du joueur (license/citizenid).</td></tr>
+                    <tr><td><code>player_name</code></td><td>string</td><td>Nom du joueur.</td></tr>
+                    <tr><td><code>vehicle_model</code></td><td>string</td><td>Modèle du véhicule loué.</td></tr>
+                    <tr><td><code>plate</code></td><td>string</td><td>Plaque d'immatriculation.</td></tr>
+                    <tr><td><code>token</code></td><td>string</td><td>Token unique (64 hex).</td></tr>
+                    <tr><td><code>start_ts</code></td><td>bigint</td><td>Timestamp début (ms).</td></tr>
+                    <tr><td><code>end_ts</code></td><td>bigint</td><td>Timestamp fin (ms).</td></tr>
+                    <tr><td><code>price_total</code></td><td>int</td><td>Prix total (hors caution).</td></tr>
+                    <tr><td><code>deposit</code></td><td>int</td><td>Montant de la caution.</td></tr>
+                    <tr><td><code>insurance</code></td><td>string</td><td><code>none</code>, <code>standard</code> ou <code>premium</code>.</td></tr>
+                    <tr><td><code>fuel_policy</code></td><td>string</td><td><code>full_to_full</code> ou <code>flat_rate</code>.</td></tr>
+                    <tr><td><code>status</code></td><td>string</td><td><code>active</code>, <code>returned</code>, <code>forced</code>, <code>expired</code>.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- COMMANDS -->
+        <h2><span class="ico"><i class="fa-solid fa-terminal"></i></span> Commandes</h2>
+        <table>
+            <thead><tr><th>Commande</th><th>Accès</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>/location</code></td><td>Tous</td><td>Ouvre le menu de location active (temps restant, prolongation, restitution).</td></tr>
+                <tr><td><code>/rentaladmin</code></td><td>Admin</td><td>Ouvre le panel d'administration (véhicules, agences, contrats).</td></tr>
+            </tbody>
+        </table>
+
+        <!-- WEBHOOKS -->
+        <h2><span class="ico"><i class="fa-brands fa-discord"></i></span> Webhooks Discord</h2>
+        <p>Lorsque activé dans <code>config.lua</code>, le script envoie des notifications automatiques vers votre salon Discord :</p>
+
+        <div class="grid">
+            <div class="feat">
+                <div class="feat-ico" style="background:var(--green-soft);color:var(--green)"><i class="fa-solid fa-plus"></i></div>
+                <div>
+                    <h4>Nouvelle location</h4>
+                    <p>Joueur, véhicule, plaque, montant, agence.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico" style="background:var(--accent-soft);color:var(--accent-light)"><i class="fa-solid fa-rotate-left"></i></div>
+                <div>
+                    <h4>Restitution</h4>
+                    <p>Joueur, véhicule, plaque, pénalités, remboursement caution.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico" style="background:var(--orange-soft);color:var(--orange)"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <h4>Prolongation</h4>
+                    <p>Joueur, nouvelle durée, coût supplémentaire.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico" style="background:var(--red-soft);color:var(--red)"><i class="fa-solid fa-shield-halved"></i></div>
+                <div>
+                    <h4>Actions admin</h4>
+                    <p>Forcer retour, remboursement, ajout/suppression véhicule ou agence.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-lang">config.lua</div>
+<pre><code>Config.Webhook = {
+    enabled = true,
+    url     = 'https://discord.com/api/webhooks/VOTRE_WEBHOOK_ICI',
+    botName = 'Perfect Rentals',
+    color   = 3447003,
+}</code></pre>
+
+        <!-- SECURITY -->
+        <h2><span class="ico"><i class="fa-solid fa-lock"></i></span> Sécurité</h2>
+        <p>Perfect Rentals intègre plusieurs couches de protection contre les exploits et la triche.</p>
+
+        <div class="grid">
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-server"></i></div>
+                <div>
+                    <h4>Calculs 100% serveur</h4>
+                    <p>Prix, pénalités, durées, cautions — tout est calculé et validé exclusivement côté serveur. Aucune donnée NUI n'est trusted.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-key"></i></div>
+                <div>
+                    <h4>Token unique</h4>
+                    <p>Chaque contrat a un token de 64 caractères hex unique. Empêche le spoofing et la manipulation de contrats.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-user-check"></i></div>
+                <div>
+                    <h4>Vérification identité</h4>
+                    <p>Chaque action (louer, rendre, prolonger) vérifie l'identité du joueur côté serveur via le framework.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-gauge-high"></i></div>
+                <div>
+                    <h4>Rate-limiting</h4>
+                    <p>Cooldowns serveur sur les actions sensibles (location, restitution, prolongation) — configurable.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-shield"></i></div>
+                <div>
+                    <h4>Anti-duplication</h4>
+                    <p>Impossible de spawn si le contrat est invalide, expiré, déjà spawné, ou si le joueur a déjà un contrat actif.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-hashtag"></i></div>
+                <div>
+                    <h4>Plaque unique</h4>
+                    <p>Chaque plaque est vérifiée en base de données (50 tentatives max) pour garantir l'unicité.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-database"></i></div>
+                <div>
+                    <h4>Validation complète</h4>
+                    <p>Durées, assurances, politiques carburant — tout est revalidé côté serveur même si envoyé depuis le NUI.</p>
+                </div>
+            </div>
+            <div class="feat">
+                <div class="feat-ico"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <h4>Expiration auto</h4>
+                    <p>Les contrats expirés depuis trop longtemps sont automatiquement clos par le serveur (caution conservée).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DB -->
+        <h2><span class="ico"><i class="fa-solid fa-database"></i></span> Schéma de base</h2>
+        <p>5 tables créées par <code>install.sql</code> :</p>
+        <table>
+            <thead><tr><th>Table</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>rentals_vehicles</code></td><td>Catalogue des véhicules (modèle, label, catégorie, stats, prix, stock, image).</td></tr>
+                <tr><td><code>rentals_locations</code></td><td>Points de location (coords PNJ, spawns, retour, showroom, blip, ped).</td></tr>
+                <tr><td><code>rentals_location_vehicles</code></td><td>Véhicules assignés par agence avec surcharges prix/caution/stock.</td></tr>
+                <tr><td><code>rentals_contracts</code></td><td>Contrats actifs (joueur, véhicule, plaque, token, dates, prix, statut).</td></tr>
+                <tr><td><code>rentals_history</code></td><td>Historique (scan, pénalités, remboursement, date de restitution).</td></tr>
+            </tbody>
+        </table>
+
+        <!-- LICENSE -->
+        <h2><span class="ico"><i class="fa-solid fa-scale-balanced"></i></span> Licence</h2>
+        <div class="card">
+            <p><strong>Usage personnel / serveur uniquement.</strong> Ne pas redistribuer, revendre ou partager ce script. Toute violation sera sanctionnée.</p>
+            <p>Pour toute question, rejoignez le Discord Spectre Script.</p>
+        </div>
+
+        <div class="page-nav">
+            <a href="features.html">
+                <div class="pn-label">Précédent</div>
+                <div class="pn-title"><i class="fa-solid fa-arrow-left" style="font-size:12px"></i> Fonctionnalités</div>
+            </a>
+            <div></div>
+        </div>
+    </div>
+
+    <footer class="doc-footer">
+        <div class="fb">Spectre Script</div>
+        <a class="fd" href="https://discord.gg/vRjBVYpRjj" target="_blank"><i class="fa-brands fa-discord"></i> Rejoindre le Discord</a>
+        <p class="fc">&copy; 2025 Spectre Script — Tous droits réservés.</p>
+    </footer>
+
+</div>
+</div>
+</body>
+</html>
