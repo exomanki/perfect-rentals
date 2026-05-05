@@ -44,9 +44,12 @@
         <table>
             <thead><tr><th>Option</th><th>Type</th><th>Défaut</th><th>Description</th></tr></thead>
             <tbody>
-                <tr><td><code>Config.Framework</code></td><td>string</td><td><code>'esx'</code></td><td>Framework du serveur : <code>'esx'</code>, <code>'qbcore'</code> ou <code>'standalone'</code>.</td></tr>
+                <tr><td><code>Config.Framework</code></td><td>string</td><td><code>'esx'</code></td><td><code>'esx'</code>, <code>'qbcore'</code> ou <code>'qbox'</code>. Qbox : resource <code>qbx_core</code> avec exports <code>qb-core</code>.</td></tr>
                 <tr><td><code>Config.TargetSystem</code></td><td>string</td><td><code>'ox_target'</code></td><td>Système d'interaction PNJ : <code>'ox_target'</code>, <code>'qtarget'</code> ou <code>'none'</code>.</td></tr>
                 <tr><td><code>Config.Locale</code></td><td>string</td><td><code>'fr'</code></td><td>Langue de l'interface : <code>'fr'</code> ou <code>'en'</code>.</td></tr>
+                <tr><td><code>Config.NotificationMode</code></td><td>string</td><td><code>'framework'</code></td><td>Toasts : <code>'framework'</code> (ESX / QB natifs, défaut), <code>'ox_lib'</code> ou <code>'custom'</code>. Alias <code>'script'</code> = <code>'ox_lib'</code>.</td></tr>
+                <tr><td><code>Config.NotificationCustom</code></td><td>table</td><td>événements vides</td><td>Si <code>custom</code> : <code>serverToClientEvent</code> et optionnellement <code>clientLocalEvent</code> (arguments : message, type).</td></tr>
+                <tr><td><code>Config.ShowRentalTimerHud</code></td><td>bool</td><td><code>true</code></td><td>HUD NUI du temps restant dans le véhicule loué ; position : <kbd>/uiloc</kbd>.</td></tr>
             </tbody>
         </table>
 

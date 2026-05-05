@@ -1,21 +1,43 @@
 CFW = {}
 
+-- Réf. cores (arborescence locale) : resources/autres framework/[qbcore]/qb-core, [Qbox]/qbx_core
 local framework = Config.Framework
+
+local function isQBFamily()
+    return framework == 'qbcore' or framework == 'qbox'
+end
+
+local function qbBridgeResourceStarted()
+    return GetResourceState('qb-core') == 'started' or GetResourceState('qbx_core') == 'started'
+end
+
+local function tryLoadQBCore()
+    local ok, obj = pcall(function()
+        return exports['qb-core']:GetCoreObject()
+    end)
+    return (ok and obj) or nil
+end
 
 if framework == 'esx' then
     if GetResourceState('es_extended') == 'started' then
         ESX = exports['es_extended']:getSharedObject()
     end
-elseif framework == 'qbcore' then
-    if GetResourceState('qb-core') == 'started' then
-        QBCore = exports['qb-core']:GetCoreObject()
+elseif isQBFamily() then
+    if qbBridgeResourceStarted() then
+        QBCore = tryLoadQBCore()
+        if not QBCore then
+            print('^1[perfect_rentals]^0 qbcore/qbox: GetCoreObject failed. Ensure qb-core or qbx_core is running.')
+        end
+    else
+        print('^1[perfect_rentals]^0 qbcore/qbox but no qb-core / qbx_core resource started.')
     end
 end
 
 function CFW.GetPlayerData()
     if framework == 'esx' then
-        return ESX.GetPlayerData()
-    elseif framework == 'qbcore' then
+        if ESX then return ESX.GetPlayerData() end
+        return {}
+    elseif isQBFamily() and QBCore then
         return QBCore.Functions.GetPlayerData()
     end
     return {}
@@ -23,12 +45,42 @@ end
 
 function CFW.Notify(msg, nType)
     nType = nType or 'info'
-    if GetResourceState('ox_lib') == 'started' then
-        lib.notify({ description = msg, type = nType })
-    elseif framework == 'esx' then
-        ESX.ShowNotification(msg)
-    elseif framework == 'qbcore' then
-        QBCore.Functions.Notify(msg, nType)
+    local mode = PR.NotifyModeCanonical()
+
+    if mode == 'custom' then
+        local c = Config.NotificationCustom or {}
+        if c.clientLocalEvent and c.clientLocalEvent ~= '' then
+            TriggerEvent(c.clientLocalEvent, msg, nType)
+            return
+        end
+        mode = 'framework'
+    end
+
+    if mode == 'framework' then
+        if framework == 'esx' and ESX then
+            ESX.ShowNotification(msg)
+            return
+        end
+        if isQBFamily() and QBCore then
+            QBCore.Functions.Notify(msg, nType)
+            return
+        end
+        return
+    end
+
+    if mode == 'ox_lib' then
+        if GetResourceState('ox_lib') == 'started' then
+            lib.notify({ description = msg, type = nType })
+            return
+        end
+        if framework == 'esx' and ESX then
+            ESX.ShowNotification(msg)
+            return
+        end
+        if isQBFamily() and QBCore then
+            QBCore.Functions.Notify(msg, nType)
+        end
+        return
     end
 end
 

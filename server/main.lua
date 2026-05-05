@@ -46,7 +46,7 @@ local function GetRentalPlayerName(src)
     if Config.Framework == 'esx' and ESX then
         local xP = ESX.GetPlayerFromId(src)
         if xP then return xP.getName() end
-    elseif Config.Framework == 'qbcore' and QBCore then
+    elseif PR.UsesQBFramework() and QBCore then
         local p = QBCore.Functions.GetPlayer(src)
         if p then return p.PlayerData.charinfo.firstname .. ' ' .. p.PlayerData.charinfo.lastname end
     end
@@ -640,10 +640,16 @@ local function RegisterContractItem()
         ESX.RegisterUsableItem('contract', function(source)
             onUse(source)
         end)
-    elseif Config.Framework == 'qbcore' and QBCore then
-        QBCore.Functions.CreateUsableItem('contract', function(source)
-            onUse(source)
-        end)
+    elseif PR.UsesQBFramework() and QBCore and QBCore.Functions then
+        -- API officielle QBCore / Qbox bridge : CreateUseableItem (double « e », cf. qb-core & qbx_core).
+        local reg = QBCore.Functions.CreateUseableItem or QBCore.Functions.CreateUsableItem
+        if reg then
+            reg('contract', function(source)
+                onUse(source)
+            end)
+        else
+            print('^3[perfect_rentals]^0 QBCore: pas de CreateUseableItem — item contract non enregistré.')
+        end
     end
 end
 

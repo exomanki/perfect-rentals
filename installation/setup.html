@@ -70,7 +70,7 @@
                 <pre><code>ensure perfect_rentals</code></pre>
                 <div class="alert alert-warn">
                     <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span><strong>Important :</strong> cette ligne doit être placée <strong>après</strong> les dépendances (<code>oxmysql</code>, <code>ox_lib</code>, <code>es_extended</code> / <code>qb-core</code>).</span>
+                    <span><strong>Important :</strong> cette ligne doit être placée <strong>après</strong> les dépendances (<code>oxmysql</code>, <code>ox_lib</code>, puis <code>es_extended</code> ou <code>qb-core</code> / <code>qbx_core</code>).</span>
                 </div>
             </div>
         </div>
@@ -80,14 +80,17 @@
             <div class="step-n">4</div>
             <div class="step-body">
                 <h4>Configuration de base</h4>
-                <p>Ouvrez <code>config.lua</code> et modifiez les 3 lignes essentielles :</p>
+                <p>Ouvrez <code>config.lua</code> — au minimum : framework, interactions, locale et notifications :</p>
                 <div class="code-lang">config.lua</div>
-<pre><code>Config.Framework    = 'esx'          -- 'esx', 'qbcore' ou 'standalone'
-Config.TargetSystem = 'ox_target'    -- 'ox_target', 'qtarget' ou 'none'
-Config.Locale       = 'fr'           -- 'fr' ou 'en'</code></pre>
+<pre><code>Config.Framework          = 'esx'          -- 'esx', 'qbcore' ou 'qbox'
+Config.TargetSystem       = 'ox_target'     -- 'ox_target', 'qtarget' ou 'none'
+Config.Locale             = 'fr'            -- 'fr' ou 'en'
+-- Toasts jeu : 'framework' (défaut), 'ox_lib' ou 'custom'
+Config.NotificationMode   = 'framework'
+Config.NotificationCustom = { serverToClientEvent = '', clientLocalEvent = '' }</code></pre>
                 <div class="alert alert-info">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>Consultez la page <a href="config.html">Configuration</a> pour le détail complet de toutes les options.</span>
+                    <span>QBCore / Qbox : item <code>contract</code> via <code>CreateUseableItem</code>. HUD temps restant : commande <kbd>/uiloc</kbd>. Détail : <a href="config.html">Configuration</a>.</span>
                 </div>
             </div>
         </div>
@@ -118,6 +121,9 @@ VALUES ('contract', 'Contract', 1, 0, 1);</code></pre>
     combinable  = nil,
     description = 'Contrat de location — Utilisez pour montrer'
 }</code></pre>
+
+                <h3>Qbox</h3>
+                <p>Utiliser <code>Config.Framework = 'qbox'</code> et conservez la même définition d’item que sous QBCore (pont qb-core).</p>
 
                 <h3>ox_inventory (data/items.lua)</h3>
                 <div class="code-lang">Lua</div>

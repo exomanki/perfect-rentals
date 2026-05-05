@@ -311,3 +311,16 @@ function PR.NuiBootstrap()
         },
     }
 end
+
+--- Mode notifications configurable : voir `Config.NotificationMode`.
+function PR.NotifyModeCanonical()
+    local m = Config.NotificationMode or 'framework'
+    if m == 'ox_lib' or m == 'script' then return 'ox_lib' end
+    if m == 'custom' then return 'custom' end
+    return 'framework'
+end
+
+function PR.UsesQBFramework()
+    local f = Config.Framework
+    return f == 'qbcore' or f == 'qbox'
+end

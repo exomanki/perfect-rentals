@@ -2,7 +2,7 @@
 
 Merci d’utiliser cette ressource **FiveM** — système de **location de véhicules** (showroom / NUI, contrats, caution, prolongation, GPS, webhook optionnel).
 
-**Dépendances :** **ox_lib**, **oxmysql**, framework configurable dans `config.lua` (ESX / QBCore / standalone selon version).
+**Dépendances :** **ox_lib**, **oxmysql**. Framework : **`esx`**, **`qbcore`**, **`qbox`**. Notifications joueur : **`Config.NotificationMode`** (défaut **`framework`** = ESX/QB ; **`ox_lib`** ou **`custom`**). HUD temps location : **`/uiloc`**.
 
 ---
 

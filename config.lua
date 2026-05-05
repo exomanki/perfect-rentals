@@ -1,8 +1,21 @@
 Config = {}
 
+--- 'esx' | 'qbcore' | 'qbox'  — Qbox utilise qbx_core (pont qb-core via exports ; pas besoin du vieux dossier qb-core).
 Config.Framework    = 'esx'
-Config.TargetSystem = 'none'
+Config.TargetSystem = 'ox_target'
 Config.Locale       = 'fr'
+
+-- Notifications joueur (par défaut : framework uniquement ).
+-- • `framework` — ESX / QBCore seulement (ShowNotification / QBCore:Notify ou équivalent côté client).
+-- • `ox_lib` — ox_lib forcé (`lib.notify` / `ox_lib:notify`). 
+-- • `custom` — `Config.NotificationCustom` (events).
+Config.NotificationMode = 'framework'
+
+-- Utilisés seulement si NotificationMode == 'custom'.
+Config.NotificationCustom = {
+    serverToClientEvent = '', -- ex : 'mes_notifs:distribute'
+    clientLocalEvent = '', -- ex : 'mes_notifs:local'
+}
 
 Config.AdminGroups = { 'admin', 'superadmin', 'god' }
 Config.AdminJobs   = {}
