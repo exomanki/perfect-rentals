@@ -1,60 +1,68 @@
 # Perfect Rentals
 
-Ressource **FiveM** — location de véhicules (showroom/NUI, contrats, caution, prolongation, GPS, webhook optionnel).
+Merci d’utiliser cette ressource **FiveM** — système de **location de véhicules** (showroom / NUI, contrats, caution, prolongation, GPS, webhook optionnel).
 
-Dépendances : **ox_lib**, **oxmysql**, framework via `config.lua` (ESX / QBCore).
+**Dépendances :** **ox_lib**, **oxmysql**, framework configurable dans `config.lua` (ESX / QBCore / standalone selon version).
 
-## Installation rapide
+---
 
-1. Copier ce dossier dans `resources/[addons]/perfect_rentals` (ou le nom adapté après `ensure` dans ton `server.cfg`).
-2. Importer `sql/install.sql` dans ta base MySQL (ou garder uniquement les migrations automatiques selon ta version déjà créée).
-3. Configurer `config.lua` (framework, locale, paiements, webhooks, etc.).
-4. Dans `server.cfg` : `ensure ox_lib`, `ensure oxmysql`, puis `ensure perfect_rentals`.
+## Liens officiels Spectre Scripts
 
-## Publier sur ton dépôt Git (nouveau repo vide)
+Une fois les fichiers du script sur ta machine (archive, dépôt cloné, etc.), passe par ces liens avant d’installer : la **documentation** détaille chaque étape, options et sécurité.
 
-Ton dépôt GitHub/GitLab doit contenir **le contenu de ce dossier** à la racine (`fxmanifest.lua` visible tout en haut du repo).
+| Ressource | Lien |
+|-----------|------|
+| **Documentation Perfect Rentals** (installation, configuration, API, fonctionnalités) | [https://spectre-scripts.reeveriehost.com/documentation/perfect_rentals/index.html](https://spectre-scripts.reeveriehost.com/documentation/perfect_rentals/index.html) |
+| **Serveur Discord — support & communauté** | [https://discord.gg/vRjBVYpRjj](https://discord.gg/vRjBVYpRjj) |
 
-À faire **sur ta machine**, dans une copie de ce dossier (ou après `git init` dans ce dossier si c’est bien la racine de ton projet dédié) :
+En cas de doute après lecture de la doc : ouvre un fil sur le Discord Spectre Scripts avec ta version du script, logs serveur/console et erreur précise.
 
-```powershell
-cd chemin\vers\perfect_rentals
-git init
-git checkout -b main
-git add -A
-git commit -m "Initial import: Perfect Rentals addon"
-git remote add origin https://github.com/TON_UTILISATEUR/TON_REPO.git
-git push -u origin main
-```
+---
 
-**Alternative** sans dupliquer : créer un dépôt vide, clone ailleurs, copier tous les fichiers de `perfect_rentals` dedans, puis commit + push.
+## Installation rapide (rappel)
 
-## Mettre à jour le dépôt après des changements
+Pour le détail (SQL, inventaire `contract`, timeouts, administrateur `/rentaladmin`, etc.), utilise la **[documentation](https://spectre-scripts.reeveriehost.com/documentation/perfect_rentals/index.html)**.
+
+1. Placer ce dossier dans ton serveur, par exemple `resources/[addons]/perfect_rentals/` (le nom doit correspondre à celui utilisé avec `ensure` dans `server.cfg`).
+2. Importer `sql/install.sql` dans ta base MySQL.
+3. Renseigner `config.lua` (framework, locale, cibles `ox_target`, webhooks Discord, etc.).
+4. Dans `server.cfg`, après tes dépendances : `ensure ox_lib`, `ensure oxmysql`, puis `ensure perfect_rentals`.
+
+Un guide pas à pas (item inventaire, ordre des `ensure`, réglages minimaux) se trouve dans la doc sous **Installation** → `setup.html` depuis la page d’accueil ci-dessus.
+
+---
+
+## Arborescence utile
+
+| Chemin | Rôle principal |
+|--------|----------------|
+| `config.lua` | Framework, locale, paiements, thème, admins |
+| `sql/install.sql` | Schéma MySQL |
+| `client/` / `server/` | Logique jeu, callbacks, NUI |
+| `ui/` | Interface NUI (HTML / CSS / JS) |
+| `locales/` | Traductions `fr` / `en` |
+| `shared/` | Logique partagée, bootstrap NUI |
+| `installation/` | Copies HTML de référence (équivalent hébergé sur le site Spectre) |
+
+Licence et crédits : voir `fxmanifest.lua` et les conditions fournies avec ton acquisition du script.
+
+---
+
+## Référence — mise à jour d’un fork / dépôt Git (optionnel)
+
+Si tu maintiens **ton propre** dépôt Git avec ce dossier :
 
 ```powershell
 cd chemin\vers\perfect_rentals
 git add -A
 git status
-git commit -m "Résumé clair du changement (ex: fix paiement au retour, i18n NUI)."
+git commit -m "Description courte du changement"
 git push
 ```
 
-Utilise des messages de commit courts et explicites ; un tag de version peut suivre celui dans `fxmanifest.lua` lors des releases :
+Tags de release (facultatif) :
 
 ```powershell
-git tag -a v1.2.0 -m "v1.2.0"
-git push origin v1.2.0
+git tag -a v1.x.x -m "v1.x.x"
+git push origin v1.x.x
 ```
-
-## Arborescence utile
-
-| Chemin           | Rôle principal                          |
-|------------------|-----------------------------------------|
-| `config.lua`     | Framework, locale, paiements, thème     |
-| `sql/install.sql`| Schéma MySQL                             |
-| `client/` / `server/` | Logique jeu + callbacks + NUI     |
-| `ui/`            | Interface NUI (HTML/CSS/JS)             |
-| `locales/`       | Traductions `fr` / `en`                 |
-| `shared/`        | Calculs prix, bootstrap NUI             |
-
-Licence et crédits : voir métadonnées dans `fxmanifest.lua` et ton usage serveur habituel.
