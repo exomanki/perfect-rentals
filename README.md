@@ -46,23 +46,5 @@ Un guide pas à pas (item inventaire, ordre des `ensure`, réglages minimaux) se
 
 Licence et crédits : voir `fxmanifest.lua` et les conditions fournies avec ton acquisition du script.
 
----
 
-## Référence — mise à jour d’un fork / dépôt Git (optionnel)
 
-Si tu maintiens **ton propre** dépôt Git avec ce dossier :
-
-```powershell
-cd chemin\vers\perfect_rentals
-git add -A
-git status
-git commit -m "Description courte du changement"
-git push
-```
-
-Tags de release (facultatif) :
-
-```powershell
-git tag -a v1.x.x -m "v1.x.x"
-git push origin v1.x.x
-```
