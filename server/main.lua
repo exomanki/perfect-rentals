@@ -269,6 +269,7 @@ lib.callback.register('perfect_rentals:rent', function(source, data)
         spawnpoints  = spawns,
         endTs        = endTs,
         startTs      = now,
+        serverTime   = now,
         deposit      = vehicle.deposit,
         priceTotal   = price.total,
         insurance    = data.insurance,
@@ -390,7 +391,7 @@ lib.callback.register('perfect_rentals:extend', function(source, data)
     local newEnd = contract.end_ts + (data.duration * 60 * 1000)
     DB.ExtendContract(contract.id, newEnd, contract.price_total + price.total)
     FW.Notify(source, L('extend_success'), 'success')
-    return { ok = true, newEndTs = newEnd, cost = price.total }
+    return { ok = true, newEndTs = newEnd, cost = price.total, serverTime = os.time() * 1000 }
 end)
 
 

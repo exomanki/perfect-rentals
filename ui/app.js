@@ -137,11 +137,23 @@ function money(n) {
 
 function msToTime(ms) {
     if (ms <= 0) return __('expired');
-    const s = Math.floor(ms / 1000);
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    let totalSec = Math.floor(ms / 1000);
+    const days = Math.floor(totalSec / 86400);
+    totalSec %= 86400;
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    const dL = __('days_short');
+    const hL = __('hours_short');
+    const mL = __('minutes_short');
+    const sU = __('timer_seconds_unit');
+    if (days >= 1)
+        return `${days} ${dL} · ${h} ${hL} ${String(m).padStart(2, '0')} ${mL}`;
+    if (h >= 1)
+        return `${h} ${hL} ${String(m).padStart(2, '0')} ${mL} ${String(s).padStart(2, '0')} ${sU}`;
+    if (m >= 1)
+        return `${m} ${mL} ${String(s).padStart(2, '0')} ${sU}`;
+    return `${s} ${sU}`;
 }
 
 function dateStr(ts) {
@@ -1382,6 +1394,227 @@ const Admin = {
 };
 
 /* ================================================================
+   HUD temps location — position (KVP Lua) / mode placement /uiloc
+   ================================================================ */
+const RentalHud = (function () {
+    /** @type {{ cx: number; cy: number }} centre du widget (% viewport), ancrage translate(-50%,-50%) */
+    let pos = { cx: 93, cy: 94 };
+    let placementActive = false;
+    let posSnapshotOnPlacementEnter = null;
+    let lastGameHudPayload = null;
+    /** @type {null | { offX:number;offY:number; w:number; h:number }} */
+    let dragState = null;
+    let hudDragHooked = false;
+
+    function clampPct(v) {
+        return Math.min(98, Math.max(2, v));
+    }
+
+    function applyPos(data) {
+        if (!data || typeof data.cx !== 'number' || typeof data.cy !== 'number') return;
+        pos = { cx: clampPct(data.cx), cy: clampPct(data.cy) };
+        const root = document.getElementById('rental-timer-hud');
+        if (!root) return;
+        root.style.bottom = 'auto';
+        root.style.right = 'auto';
+        root.style.left = `${pos.cx}%`;
+        root.style.top = `${pos.cy}%`;
+        root.style.transform = 'translate(-50%, -50%)';
+    }
+
+    function resetCornerLayoutCss() {
+        const root = document.getElementById('rental-timer-hud');
+        if (!root) return;
+        root.style.bottom = '';
+        root.style.right = '';
+        root.style.left = '';
+        root.style.top = '';
+        root.style.transform = '';
+        pos = { cx: 93, cy: 94 };
+    }
+
+    function applyHudFromPayload(data, forceShow) {
+        const root = document.getElementById('rental-timer-hud');
+        const labEl = document.getElementById('rental-timer-hud-label');
+        const valEl = document.getElementById('rental-timer-hud-value');
+        if (!root || !labEl || !valEl || !data) return;
+        const vis = forceShow === true ? true : !!data.visible;
+        if (!vis) {
+            root.classList.add('hidden');
+            root.setAttribute('aria-hidden', 'true');
+            root.classList.remove('rental-timer-hud-expired');
+            return;
+        }
+        labEl.textContent = data.label || '';
+        valEl.textContent = data.value || '';
+        root.classList.remove('hidden');
+        root.setAttribute('aria-hidden', 'false');
+        root.classList.toggle('rental-timer-hud-expired', !!data.expired);
+    }
+
+    function showPlacementBanner(hintHtml) {
+        const layer = document.getElementById('rental-timer-hud-place-layer');
+        const hintEl = document.getElementById('rental-timer-hud-place-hint');
+        if (!layer || !hintEl) return;
+        hintEl.textContent = hintHtml || '';
+        layer.classList.remove('hidden');
+        layer.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('timer-hud-placing');
+    }
+
+    function hidePlacementBanner() {
+        const layer = document.getElementById('rental-timer-hud-place-layer');
+        if (layer) {
+            layer.classList.add('hidden');
+            layer.setAttribute('aria-hidden', 'true');
+        }
+        document.body.classList.remove('timer-hud-placing');
+    }
+
+    async function teardownPlacement(saveCoords) {
+        placementActive = false;
+        dragState = null;
+        hidePlacementBanner();
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+
+        if (!saveCoords && posSnapshotOnPlacementEnter) {
+            applyPos(posSnapshotOnPlacementEnter);
+        }
+        posSnapshotOnPlacementEnter = null;
+
+        if (lastGameHudPayload) {
+            applyHudFromPayload(lastGameHudPayload, lastGameHudPayload.visible);
+        } else {
+            applyHudFromPayload({ visible: false });
+        }
+
+        await nui('finishTimerHudPlacement').catch(() => null);
+    }
+
+    function pxToPct(centerXpx, centerYpx) {
+        const iw = window.innerWidth || 1920;
+        const ih = window.innerHeight || 1080;
+        return {
+            cx: clampPct((centerXpx / iw) * 100),
+            cy: clampPct((centerYpx / ih) * 100),
+        };
+    }
+
+    function clientCenterFromTopLeft(left, top, w, h) {
+        const pad = 4;
+        const iw = window.innerWidth;
+        const ih = window.innerHeight;
+        let L = Math.max(pad, Math.min(left, iw - w - pad));
+        let T = Math.max(pad, Math.min(top, ih - h - pad));
+        return pxToPct(L + w / 2, T + h / 2);
+    }
+
+    function onDragMove(e) {
+        if (!dragState || !placementActive) return;
+        const nw = dragState.w;
+        const nh = dragState.h;
+        const nx = e.clientX - dragState.offX;
+        const ny = e.clientY - dragState.offY;
+        applyPos(clientCenterFromTopLeft(nx, ny, nw, nh));
+        e.preventDefault();
+    }
+
+    function onDragEnd() {
+        dragState = null;
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+    }
+
+    function bindHudDragOnce() {
+        const root = document.getElementById('rental-timer-hud');
+        if (!root || hudDragHooked) return;
+        hudDragHooked = true;
+        root.addEventListener('mousedown', onHudMouseDown);
+    }
+
+    function onHudMouseDown(e) {
+        if (!placementActive) return;
+        const root = document.getElementById('rental-timer-hud');
+        if (!root || !root.contains(e.target)) return;
+        const r = root.getBoundingClientRect();
+        dragState = {
+            offX: e.clientX - r.left,
+            offY: e.clientY - r.top,
+            w: r.width,
+            h: r.height,
+        };
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    async function placementConfirm(e) {
+        if (e) e.preventDefault();
+        await nui('saveTimerHudPos', pos).catch(() => null);
+        await teardownPlacement(true);
+    }
+
+    async function placementCancel(e) {
+        if (e) e.preventDefault();
+        await teardownPlacement(false);
+    }
+
+    return {
+        isPlacing() {
+            return placementActive;
+        },
+        onTimerHudPos(data) {
+            if (!data || typeof data.cx !== 'number' || typeof data.cy !== 'number') {
+                resetCornerLayoutCss();
+                return;
+            }
+            applyPos(data);
+        },
+        /** message rentalTimerHud */
+        handleGameTimer(data) {
+            lastGameHudPayload = data ? { ...data } : null;
+            if (placementActive) return;
+            applyHudFromPayload(data);
+        },
+        /** message rentalTimerHudPlacement */
+        startPlacement(data) {
+            if (!data || !data.active) {
+                placementActive = false;
+                hidePlacementBanner();
+                return;
+            }
+            posSnapshotOnPlacementEnter = { ...pos };
+            placementActive = true;
+            showPlacementBanner(data.hint || '');
+
+            const root = document.getElementById('rental-timer-hud');
+            if (!root) return;
+            bindHudDragOnce();
+            applyHudFromPayload(
+                {
+                    visible: true,
+                    label: data.demoLabel || __('ui_timer_label'),
+                    value: data.demoValue || '—',
+                    expired: false,
+                },
+                true
+            );
+            applyPos(pos);
+        },
+
+        placementConfirm,
+        placementCancel,
+
+        hydrateFromLuaOnLoad(posData) {
+            if (posData && typeof posData.cx === 'number') applyPos(posData);
+            else resetCornerLayoutCss();
+        },
+    };
+})();
+
+/* ================================================================
    NUI Listeners
    ================================================================ */
 window.addEventListener('message', (e) => {
@@ -1412,10 +1645,32 @@ window.addEventListener('message', (e) => {
             document.getElementById('app').classList.add('hidden');
             document.getElementById('admin-app').classList.add('hidden');
             break;
+        case 'rentalTimerHud':
+            RentalHud.handleGameTimer(data);
+            break;
+        case 'rentalTimerHudPos':
+            RentalHud.onTimerHudPos(data);
+            break;
+        case 'rentalTimerHudPlacement':
+            RentalHud.startPlacement(data);
+            break;
     }
 });
 
 window.addEventListener('keydown', (e) => {
+    if (RentalHud.isPlacing()) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            RentalHud.placementCancel(e);
+            return;
+        }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            RentalHud.placementConfirm(e);
+            return;
+        }
+    }
+
     if (e.key === 'Escape') {
         const co = document.getElementById('contract-overlay');
         if (co && co.classList.contains('cp-show')) {

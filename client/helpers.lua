@@ -13,6 +13,36 @@ function SyncServerTime(ts)
     if ts and ts > 0 then serverTimeOffset = ts - GetGameTimer() end
 end
 
+--- Temps restant lisible pour le HUD / affichages (millisecondes).
+function FormatRentalRemainMs(remMs)
+    if remMs <= 0 then return L('timer_hud_expired') end
+    local totalSec = math.floor(remMs / 1000)
+    local days = math.floor(totalSec / 86400)
+    totalSec = totalSec % 86400
+    local h = math.floor(totalSec / 3600)
+    local m = math.floor((totalSec % 3600) / 60)
+    local s = totalSec % 60
+    if days >= 1 then
+        return string.format('%d %s · %d %s %02d %s',
+            days, L('ui_days_short'), h, L('ui_hours_short'), m, L('ui_minutes_short'))
+    elseif h >= 1 then
+        return string.format('%d %s %02d %s %02d %s',
+            h, L('ui_hours_short'), m, L('ui_minutes_short'), s, L('ui_timer_seconds_unit'))
+    elseif m >= 1 then
+        return string.format('%d %s %02d %s',
+            m, L('ui_minutes_short'), s, L('ui_timer_seconds_unit'))
+    end
+    return string.format('%d %s', s, L('ui_timer_seconds_unit'))
+end
+
+function PlayerInRentalVehicle()
+    if not rentalVehicle or rentalVehicle == 0 or not DoesEntityExist(rentalVehicle) then
+        return false
+    end
+    local ped = PlayerPedId()
+    return GetVehiclePedIsIn(ped, false) == rentalVehicle
+end
+
 function LoadAnimDict(dict)
     RequestAnimDict(dict)
     local t = 0

@@ -202,6 +202,7 @@ function PR.NuiBootstrap()
             minutes_short = L('ui_minutes_short'),
             hours_short = L('ui_hours_short'),
             days_short = L('ui_days_short'),
+            timer_seconds_unit = L('ui_timer_seconds_unit'),
             nav_catalog = L('ui_nav_catalog'),
             nav_active = L('ui_nav_active'),
             nav_history = L('ui_nav_history'),

@@ -157,6 +157,7 @@ end)
 RegisterNUICallback('extend', function(data, cb)
     local r = lib.callback.await('perfect_rentals:extend', false, data)
     if r and r.ok and r.newEndTs then
+        if r.serverTime then SyncServerTime(r.serverTime) end
         StartRentalTimer(r.newEndTs)
     end
     cb(r or { ok = false })

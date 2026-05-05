@@ -328,6 +328,11 @@ function SpawnRentalVehicle(data)
     SetNewWaypoint(spawn.x, spawn.y)
 
     CFW.Notify(L('rental_vehicle_ready_gps'), 'success')
+    if data.serverTime then
+        SyncServerTime(data.serverTime)
+    elseif data.startTs then
+        SyncServerTime(data.startTs)
+    end
     if data.endTs then StartRentalTimer(data.endTs) end
 
     CreateThread(function()
@@ -510,50 +515,88 @@ RegisterNetEvent('perfect_rentals:forceDeleteVehicle', function(plate)
     end
 end)
 
+local TIMER_HUD_KVP_KEY = 'perfect_rentals_timer_hud_pos'
+local timerHudPlacementMode = false
+
+local function ClampHudPct(x)
+    if type(x) ~= 'number' or x ~= x then return nil end
+    if x < 2 then return 2 end
+    if x > 98 then return 98 end
+    return x
+end
+
+local function LoadTimerHudPosition()
+    local def = { cx = 93, cy = 94 }
+    local raw = GetResourceKvpString(TIMER_HUD_KVP_KEY)
+    if not raw or raw == '' then return def end
+    local ok, t = pcall(json.decode, raw)
+    if not ok or type(t) ~= 'table' then return def end
+    local cx = ClampHudPct(tonumber(t.cx))
+    local cy = ClampHudPct(tonumber(t.cy))
+    if not cx or not cy then return def end
+    return { cx = cx, cy = cy }
+end
+
+local function SendTimerHudPosToNui()
+    SendNUIMessage({ action = 'rentalTimerHudPos', data = LoadTimerHudPosition() })
+end
+
 local timerEndTs = nil
-local timerHudShown = false
-local lastTimerHudTxt = ''
+local rentalTimerHudShown = false
+local lastRentalTimerHudPayload = ''
+
+local function HideRentalTimerHudNui()
+    if rentalTimerHudShown then
+        SendNUIMessage({ action = 'rentalTimerHud', data = { visible = false } })
+        rentalTimerHudShown = false
+    end
+    lastRentalTimerHudPayload = ''
+end
+
+CreateThread(function()
+    Wait(750)
+    SendNUIMessage({ action = 'applyTheme', data = Config.Theme or {} })
+    SendTimerHudPosToNui()
+end)
 
 function StartRentalTimer(endTs)
     timerEndTs = endTs
-    lastTimerHudTxt = ''
+    lastRentalTimerHudPayload = ''
 end
 
 function StopRentalTimer()
     timerEndTs = nil
-    lastTimerHudTxt = ''
-    if timerHudShown and GetResourceState('ox_lib') == 'started' then
-        lib.hideTextUI()
-        timerHudShown = false
-    end
+    HideRentalTimerHudNui()
 end
 
 CreateThread(function()
-    local function fmt(rem)
-        if rem <= 0 then return L('timer_hud_expired') end
-        local s = math.floor(rem / 1000)
-        local h = math.floor(s / 3600)
-        local m = math.floor((s % 3600) / 60)
-        local sec = s % 60
-        return string.format('%02d:%02d:%02d', h, m, sec)
-    end
     while true do
         Wait(600)
-        if not Config.ShowRentalTimerHud or not timerEndTs then
-            if timerHudShown and GetResourceState('ox_lib') == 'started' then lib.hideTextUI() end
-            timerHudShown = false
-            lastTimerHudTxt = ''
-        elseif NUI.IsOpen() or contractOpen then
-            if timerHudShown and GetResourceState('ox_lib') == 'started' then lib.hideTextUI() end
-            timerHudShown = false
-            lastTimerHudTxt = ''
-        elseif GetResourceState('ox_lib') == 'started' then
+        local hideHud = not Config.ShowRentalTimerHud
+            or not timerEndTs
+            or not PlayerInRentalVehicle()
+            or NUI.IsOpen()
+            or contractOpen
+
+        if hideHud then
+            HideRentalTimerHudNui()
+        else
             local rem = timerEndTs - GetServerTime()
-            local line = L('timer_hud_prefix') .. '  ' .. fmt(rem)
-            if line ~= lastTimerHudTxt then
-                lib.showTextUI(line)
-                lastTimerHudTxt = line
-                timerHudShown = true
+            local remainStr = FormatRentalRemainMs(rem)
+            local expired = rem <= 0
+            local payload = remainStr .. '|' .. (expired and '1' or '0')
+            if payload ~= lastRentalTimerHudPayload then
+                SendNUIMessage({
+                    action = 'rentalTimerHud',
+                    data = {
+                        visible = true,
+                        label = L('ui_timer_label'),
+                        value = remainStr,
+                        expired = expired,
+                    }
+                })
+                lastRentalTimerHudPayload = payload
+                rentalTimerHudShown = true
             end
         end
     end
@@ -597,6 +640,46 @@ CreateThread(function()
         end
     end
 end)
+
+RegisterNUICallback('saveTimerHudPos', function(data, cb)
+    local cx = ClampHudPct(tonumber(data and data.cx))
+    local cy = ClampHudPct(tonumber(data and data.cy))
+    if cx and cy then
+        SetResourceKvp(TIMER_HUD_KVP_KEY, json.encode({ cx = cx, cy = cy }))
+    end
+    cb({ ok = true })
+end)
+
+RegisterNUICallback('finishTimerHudPlacement', function(_, cb)
+    if timerHudPlacementMode then
+        timerHudPlacementMode = false
+        SetNuiFocus(false, false)
+        SendNUIMessage({ action = 'rentalTimerHudPlacement', data = { active = false } })
+    end
+    cb('ok')
+end)
+
+RegisterCommand('uiloc', function()
+    if timerHudPlacementMode then
+        return
+    end
+    if NUI.IsOpen() or contractOpen then
+        CFW.Notify(L('ui_timer_placement_busy'), 'error')
+        return
+    end
+    timerHudPlacementMode = true
+    SendTimerHudPosToNui()
+    SendNUIMessage({
+        action = 'rentalTimerHudPlacement',
+        data = {
+            active = true,
+            hint = L('ui_timer_placement_hint'),
+            demoLabel = L('ui_timer_label'),
+            demoValue = L('ui_timer_placement_demo'),
+        },
+    })
+    SetNuiFocus(true, true)
+end, false)
 
 local contractProp = nil
 local contractPropModel = GetHashKey('prop_cs_documents_01')
@@ -678,6 +761,10 @@ AddEventHandler('onResourceStop', function(res)
     if deliveryBlip and DoesBlipExist(deliveryBlip) then RemoveBlip(deliveryBlip) end
     DestroyPreview()
     RemoveOxTargetZones()
-    if GetResourceState('ox_lib') == 'started' then lib.hideTextUI() end
+    HideRentalTimerHudNui()
+    if timerHudPlacementMode then
+        timerHudPlacementMode = false
+        SetNuiFocus(false, false)
+    end
     if NUI.IsOpen() then NUI.Close() end
 end)

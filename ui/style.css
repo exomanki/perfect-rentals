@@ -1744,33 +1744,140 @@ body {
 }
 
 /* ======================================== */
-/* TIMER WIDGET (in-game HUD)               */
+/* Mode placement HUD — /uiloc              */
 /* ======================================== */
-.timer-widget {
+.timer-hud-place-layer {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: var(--bg-primary);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border-light);
+    inset: 0;
+    z-index: 399;
+    pointer-events: none;
+}
+
+.timer-hud-place-layer.hidden { display: none !important; }
+
+.timer-hud-place-banner {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    max-width: min(560px, 92vw);
+    background: rgba(10, 10, 18, 0.75);
+    border: none;
     border-radius: var(--radius-sm);
-    padding: 8px 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+    justify-content: center;
+}
+
+.timer-hud-place-banner i { color: var(--accent-light); flex-shrink: 0; font-size: 14px; }
+
+body.timer-hud-placing .rental-timer-hud {
+    pointer-events: auto !important;
+    z-index: 401;
+}
+
+body.timer-hud-placing .rental-timer-hud-inner {
+    cursor: move;
+    outline: 2px dashed var(--accent-light);
+    outline-offset: 3px;
+    box-shadow: none;
+}
+
+/* ======================================== */
+/* HUD temps restant (en jeu, léger)       */
+/* Aligné sur .toast / carte location      */
+/* ======================================== */
+.rental-timer-hud {
+    position: fixed;
+    bottom: 16px;
+    right: max(16px, env(safe-area-inset-right));
+    left: auto;
+    top: auto;
+    transform: translate(0, 0);
+    z-index: 250;
+    pointer-events: none;
+    animation: rentalTimerHudIn 220ms ease-out both;
+}
+
+.rental-timer-hud.hidden { display: none !important; }
+
+@keyframes rentalTimerHudIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.rental-timer-hud-inner {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: monospace;
-    color: var(--accent-light);
-    z-index: 100;
+    padding: 5px 10px;
+    /* Fond quasi transparent (indépendant du thème trop opaque --bg-primary) */
+    background: rgba(22, 22, 40, 0.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: none;
+    border-left: 3px solid var(--accent-light);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+    max-width: min(240px, 48vw);
 }
 
-.timer-widget i { font-size: 12px; }
-.timer-widget.expired { color: var(--red); border-color: var(--red); animation: pulse 1.5s infinite; }
+.rental-timer-hud-inner > i {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--accent-light);
+    opacity: 0.9;
+}
 
-@keyframes pulse {
+.rental-timer-hud-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.rental-timer-hud-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.rental-timer-hud-value {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: monospace;
+    line-height: 1.25;
+    color: var(--accent-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rental-timer-hud-expired .rental-timer-hud-inner {
+    border-left-color: var(--red);
+    animation: rentalTimerHudPulse 1.4s ease-in-out infinite;
+}
+
+.rental-timer-hud-expired .rental-timer-hud-inner > i,
+.rental-timer-hud-expired .rental-timer-hud-value {
+    color: var(--red);
+}
+
+@keyframes rentalTimerHudPulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    50% { opacity: 0.72; }
 }
 
 /* ======================================== */

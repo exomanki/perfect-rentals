@@ -251,6 +251,25 @@
     <!-- Toast -->
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- Mode placement HUD (commande /uiloc) -->
+    <div id="rental-timer-hud-place-layer" class="timer-hud-place-layer hidden" aria-hidden="true">
+        <div class="timer-hud-place-banner">
+            <i class="fa-solid fa-up-down-left-right" aria-hidden="true"></i>
+            <span id="rental-timer-hud-place-hint"></span>
+        </div>
+    </div>
+
+    <!-- Petit HUD temps restant (véhicule loué) — même thème que le reste -->
+    <div id="rental-timer-hud" class="rental-timer-hud hidden" aria-hidden="true">
+        <div class="rental-timer-hud-inner">
+            <i class="fa-solid fa-clock" aria-hidden="true"></i>
+            <div class="rental-timer-hud-copy">
+                <span class="rental-timer-hud-label" id="rental-timer-hud-label"></span>
+                <span class="rental-timer-hud-value" id="rental-timer-hud-value"></span>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
